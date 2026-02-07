@@ -1,0 +1,114 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Extract version from tag
+      id: version
+      shell: bash
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Restore dependencies
+      run: dotnet restore src/ZapretUltimate/ZapretUltimate.csproj
+
+    - name: Build and Publish
+      run: |
+        dotnet publish src/ZapretUltimate/ZapretUltimate.csproj -c Release -r win-x64 --self-contained -o release/publish
+
+    - name: Download Zapret assets
+      shell: pwsh
+      run: |
+        # Download assets from Smart-Zapret-Launcher releases
+        $assetsUrl = "https://github.com/Bl00dLuna/Smart-Zapret-Launcher/releases/latest/download/Smart-Zapret-Launcher.zip"
+        $tempZip = "temp_assets.zip"
+        $tempDir = "temp_assets"
+
+        Write-Host "Downloading assets from Smart-Zapret-Launcher..."
+        Invoke-WebRequest -Uri $assetsUrl -OutFile $tempZip
+
+        Write-Host "Extracting assets..."
+        Expand-Archive -Path $tempZip -DestinationPath $tempDir -Force
+
+        # Copy required folders
+        $sourcePath = Get-ChildItem -Path $tempDir -Directory | Select-Object -First 1
+
+        if (Test-Path "$($sourcePath.FullName)/bin") {
+            Copy-Item -Recurse -Force "$($sourcePath.FullName)/bin" "release/publish/bin"
+            Write-Host "Copied bin folder"
+        }
+
+        if (Test-Path "$($sourcePath.FullName)/configs") {
+            Copy-Item -Recurse -Force "$($sourcePath.FullName)/configs" "release/publish/configs"
+            Write-Host "Copied configs folder"
+        }
+
+        if (Test-Path "$($sourcePath.FullName)/lists") {
+            Copy-Item -Recurse -Force "$($sourcePath.FullName)/lists" "release/publish/lists"
+            Write-Host "Copied lists folder"
+        }
+
+        # Cleanup
+        Remove-Item -Recurse -Force $tempZip, $tempDir
+
+    - name: Install Inno Setup
+      shell: pwsh
+      run: |
+        choco install innosetup -y --no-progress
+
+    - name: Build Installer
+      shell: pwsh
+      run: |
+        $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+        iscc /DAppVersion=${{ steps.version.outputs.VERSION }} installer.iss
+
+    - name: Create ZIP archive
+      shell: pwsh
+      run: |
+        Compress-Archive -Path "release/publish/*" -DestinationPath "release/ZapretUltimate-${{ steps.version.outputs.VERSION }}-portable.zip"
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Zapret Ultimate v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## Zapret Ultimate v${{ steps.version.outputs.VERSION }}
+
+          Современный GUI интерфейс для управления Zapret - инструмента обхода DPI блокировок.
+
+          ### Скачать
+          - **ZapretUltimate-${{ steps.version.outputs.VERSION }}-Setup.exe** - Установщик (рекомендуется)
+          - **ZapretUltimate-${{ steps.version.outputs.VERSION }}-portable.zip** - Portable версия
+
+          ### Возможности
+          - Удобный графический интерфейс
+          - Выбор конфигов по категориям (Discord, YouTube/Twitch, Gaming, Universal)
+          - Сворачивание в системный трей
+          - Автозапуск при старте Windows
+          - Настройки IPSet (Global и Gaming)
+          - Сброс сетевых настроек
+
+          ### Требования
+          - Windows 10/11 (x64)
+          - Права администратора
+        files: |
+          release/ZapretUltimate-${{ steps.version.outputs.VERSION }}-Setup.exe
+          release/ZapretUltimate-${{ steps.version.outputs.VERSION }}-portable.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
