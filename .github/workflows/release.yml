@@ -33,37 +33,28 @@ jobs:
     - name: Download Zapret assets
       shell: pwsh
       run: |
-        # Download assets from Smart-Zapret-Launcher releases
-        $assetsUrl = "https://github.com/Bl00dLuna/Smart-Zapret-Launcher/releases/latest/download/Smart-Zapret-Launcher.zip"
-        $tempZip = "temp_assets.zip"
-        $tempDir = "temp_assets"
-
-        Write-Host "Downloading assets from Smart-Zapret-Launcher..."
-        Invoke-WebRequest -Uri $assetsUrl -OutFile $tempZip
-
-        Write-Host "Extracting assets..."
-        Expand-Archive -Path $tempZip -DestinationPath $tempDir -Force
+        # Clone Smart-Zapret-Launcher repository to get assets
+        Write-Host "Cloning Smart-Zapret-Launcher repository..."
+        git clone --depth 1 https://github.com/Bl00dLuna/Smart-Zapret-Launcher.git temp_repo
 
         # Copy required folders
-        $sourcePath = Get-ChildItem -Path $tempDir -Directory | Select-Object -First 1
-
-        if (Test-Path "$($sourcePath.FullName)/bin") {
-            Copy-Item -Recurse -Force "$($sourcePath.FullName)/bin" "release/publish/bin"
+        if (Test-Path "temp_repo/bin") {
+            Copy-Item -Recurse -Force "temp_repo/bin" "release/publish/bin"
             Write-Host "Copied bin folder"
         }
 
-        if (Test-Path "$($sourcePath.FullName)/configs") {
-            Copy-Item -Recurse -Force "$($sourcePath.FullName)/configs" "release/publish/configs"
+        if (Test-Path "temp_repo/configs") {
+            Copy-Item -Recurse -Force "temp_repo/configs" "release/publish/configs"
             Write-Host "Copied configs folder"
         }
 
-        if (Test-Path "$($sourcePath.FullName)/lists") {
-            Copy-Item -Recurse -Force "$($sourcePath.FullName)/lists" "release/publish/lists"
+        if (Test-Path "temp_repo/lists") {
+            Copy-Item -Recurse -Force "temp_repo/lists" "release/publish/lists"
             Write-Host "Copied lists folder"
         }
 
         # Cleanup
-        Remove-Item -Recurse -Force $tempZip, $tempDir
+        Remove-Item -Recurse -Force temp_repo
 
     - name: Install Inno Setup
       shell: pwsh
