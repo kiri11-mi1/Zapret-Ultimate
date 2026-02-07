@@ -12,6 +12,7 @@
     <Authors>Zapret Ultimate</Authors>
     <Description>GUI launcher for Zapret DPI bypass tool</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
