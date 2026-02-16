@@ -79,13 +79,8 @@ public partial class MainViewModel : ObservableObject
 
             var categoryVm = new ConfigCategoryViewModel(category, categoryConfigs);
 
-            foreach (var config in categoryConfigs)
-            {
-                if (_settings.SelectedConfigs.Contains(config.FilePath))
-                {
-                    config.IsSelected = true;
-                }
-            }
+            categoryVm.SelectedConfig = categoryConfigs
+                .FirstOrDefault(c => _settings.SelectedConfigs.Contains(c.FilePath));
 
             Categories.Add(categoryVm);
         }
@@ -143,8 +138,9 @@ public partial class MainViewModel : ObservableObject
         }
 
         var selectedConfigs = Categories
-            .SelectMany(c => c.Configs)
-            .Where(c => c.IsSelected)
+            .Select(c => c.SelectedConfig)
+            .Where(c => c != null)
+            .Cast<ZapretConfig>()
             .ToList();
 
         if (selectedConfigs.Count == 0)
@@ -234,29 +230,12 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void SelectAllInCategory(ConfigCategoryViewModel category)
-    {
-        foreach (var config in category.Configs)
-        {
-            config.IsSelected = true;
-        }
-    }
-
-    [RelayCommand]
-    private void DeselectAllInCategory(ConfigCategoryViewModel category)
-    {
-        foreach (var config in category.Configs)
-        {
-            config.IsSelected = false;
-        }
-    }
-
     public async Task HandleAutoStart()
     {
         var selectedConfigs = Categories
-            .SelectMany(c => c.Configs)
-            .Where(c => _settings.SelectedConfigs.Contains(c.FilePath))
+            .Select(c => c.SelectedConfig)
+            .Where(c => c != null)
+            .Cast<ZapretConfig>()
             .ToList();
 
         if (selectedConfigs.Count > 0)
@@ -278,7 +257,7 @@ public partial class ConfigCategoryViewModel : ObservableObject
     public ObservableCollection<ZapretConfig> Configs { get; }
 
     [ObservableProperty]
-    private bool _isExpanded = true;
+    private ZapretConfig? _selectedConfig;
 
     public ConfigCategoryViewModel(ConfigCategory category, IEnumerable<ZapretConfig> configs)
     {

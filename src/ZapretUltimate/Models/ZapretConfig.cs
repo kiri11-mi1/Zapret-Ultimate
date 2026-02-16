@@ -13,4 +13,6 @@ public partial class ZapretConfig : ObservableObject
     private bool _isSelected;
 
     public string DisplayName => string.IsNullOrEmpty(Name) ? FileName : Name;
+
+    public override string ToString() => DisplayName;
 }

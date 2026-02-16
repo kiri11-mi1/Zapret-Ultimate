@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ZapretUltimate.Models;
 
 namespace ZapretUltimate.Services;
@@ -37,7 +38,7 @@ public class ConfigService
 
         var files = Directory.GetFiles(folderPath, "*.conf");
 
-        foreach (var file in files.OrderBy(f => f))
+        foreach (var file in files.OrderBy(Path.GetFileName, new NaturalSortComparer()))
         {
             var fileName = Path.GetFileNameWithoutExtension(file);
             configs.Add(new ZapretConfig
@@ -145,5 +146,19 @@ public class ConfigService
                 // Ignore cleanup errors
             }
         }
+    }
+}
+
+internal class NaturalSortComparer : IComparer<string?>
+{
+    [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+    private static extern int StrCmpLogicalW(string psz1, string psz2);
+
+    public int Compare(string? x, string? y)
+    {
+        if (x == null && y == null) return 0;
+        if (x == null) return -1;
+        if (y == null) return 1;
+        return StrCmpLogicalW(x, y);
     }
 }

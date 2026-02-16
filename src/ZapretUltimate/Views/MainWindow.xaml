@@ -4,8 +4,8 @@
         xmlns:vm="clr-namespace:ZapretUltimate.ViewModels"
         xmlns:converters="clr-namespace:ZapretUltimate.Converters"
         Title="Zapret Ultimate"
-        Width="700"
-        Height="650"
+        Width="800"
+        Height="750"
         MinWidth="600"
         MinHeight="500"
         WindowStartupLocation="CenterScreen"
@@ -89,42 +89,26 @@
                 <ItemsControl ItemsSource="{Binding Categories}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Expander Style="{StaticResource CategoryExpander}"
-                                      IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-                                <Expander.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontSize="16"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextBrush}"/>
-                                        <TextBlock Grid.Column="1"
-                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                   Margin="0,0,24,0">
-                                            <Run Text="{Binding Configs.Count, Mode=OneWay}"/>
-                                            <Run Text=" конфигов"/>
-                                        </TextBlock>
-                                    </Grid>
-                                </Expander.Header>
-                                <ItemsControl ItemsSource="{Binding Configs}" Margin="0,8,0,0">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <CheckBox Style="{StaticResource ConfigCheckBox}"
-                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                      Content="{Binding DisplayName}"
-                                                      Margin="0,0,8,4"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Expander>
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,16,0"/>
+                                    <ComboBox Grid.Column="1"
+                                              Style="{StaticResource ConfigComboBox}"
+                                              ItemContainerStyle="{StaticResource ConfigComboBoxItem}"
+                                              ItemsSource="{Binding Configs}"
+                                              SelectedItem="{Binding SelectedConfig, Mode=TwoWay}"
+                                              DisplayMemberPath="DisplayName"/>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
