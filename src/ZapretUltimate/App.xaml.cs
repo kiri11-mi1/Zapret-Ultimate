@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -11,6 +12,11 @@ namespace ZapretUltimate;
 
 public partial class App : Application
 {
+    private const string MutexName = "ZapretUltimate_SingleInstance_Mutex";
+    private const string EventName = "ZapretUltimate_ShowWindow_Event";
+
+    private static Mutex? _mutex;
+    private EventWaitHandle? _showWindowEvent;
     private TaskbarIcon? _trayIcon;
     private MainWindow? _mainWindow;
     private MainViewModel? _viewModel;
@@ -18,6 +24,18 @@ public partial class App : Application
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
+        _mutex = new Mutex(true, MutexName, out bool isNewInstance);
+
+        if (!isNewInstance)
+        {
+            SignalExistingInstance();
+            Shutdown();
+            return;
+        }
+
+        _showWindowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, EventName);
+        ListenForShowWindowSignal();
+
         _isAutoStart = e.Args.Contains("--autostart");
 
         try
@@ -133,6 +151,31 @@ public partial class App : Application
         _mainWindow.Activate();
     }
 
+    private static void SignalExistingInstance()
+    {
+        try
+        {
+            using var evt = EventWaitHandle.OpenExisting(EventName);
+            evt.Set();
+        }
+        catch { }
+    }
+
+    private void ListenForShowWindowSignal()
+    {
+        var thread = new Thread(() =>
+        {
+            while (_showWindowEvent != null && _showWindowEvent.WaitOne())
+            {
+                Dispatcher.Invoke(ShowMainWindow);
+            }
+        })
+        {
+            IsBackground = true
+        };
+        thread.Start();
+    }
+
     private async void ExitApplication()
     {
         if (_viewModel != null)
@@ -141,6 +184,9 @@ public partial class App : Application
         }
 
         _trayIcon?.Dispose();
+        _showWindowEvent?.Dispose();
+        _mutex?.ReleaseMutex();
+        _mutex?.Dispose();
         Shutdown();
     }
 
@@ -152,6 +198,9 @@ public partial class App : Application
         }
 
         _trayIcon?.Dispose();
+        _showWindowEvent?.Dispose();
+        _mutex?.ReleaseMutex();
+        _mutex?.Dispose();
     }
 }
 
