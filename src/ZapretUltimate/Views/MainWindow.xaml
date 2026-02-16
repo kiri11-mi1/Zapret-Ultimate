@@ -116,103 +116,89 @@
 
             <!-- Settings Panel -->
             <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,16,0,0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <StackPanel>
+                    <!-- Autostart (always visible) -->
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Автозапуск" FontWeight="Medium"/>
+                            <TextBlock Text="Запускать при входе в Windows"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <ToggleButton Grid.Column="1"
+                                      Style="{StaticResource ToggleSwitch}"
+                                      IsChecked="{Binding AutoStartEnabled, Mode=TwoWay}"/>
+                    </Grid>
 
-                    <!-- Left Column -->
-                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                        <TextBlock Text="Настройки"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,12"/>
+                    <!-- Advanced Settings (collapsed by default) -->
+                    <Expander Style="{StaticResource SettingsExpander}">
+                        <Expander.Header>
+                            <TextBlock Text="Дополнительно"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </Expander.Header>
+                        <StackPanel Margin="0,8,0,0">
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="IPSet Global" FontWeight="Medium"/>
+                                    <TextBlock Text="Фильтрация по IP-адресам"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1"
+                                              Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding IpsetGlobalEnabled, Mode=TwoWay}"/>
+                            </Grid>
 
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="IPSet Global" FontWeight="Medium"/>
-                                <TextBlock Text="Фильтрация по IP-адресам"
-                                           FontSize="12"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1"
-                                          Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding IpsetGlobalEnabled, Mode=TwoWay}"/>
-                        </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="IPSet Gaming" FontWeight="Medium"/>
+                                    <TextBlock Text="IP-фильтр для игр"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1"
+                                              Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding IpsetGamingEnabled, Mode=TwoWay}"/>
+                            </Grid>
 
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="IPSet Gaming" FontWeight="Medium"/>
-                                <TextBlock Text="IP-фильтр для игр"
-                                           FontSize="12"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1"
-                                          Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding IpsetGamingEnabled, Mode=TwoWay}"/>
-                        </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Показывать логи" FontWeight="Medium"/>
+                                    <TextBlock Text="Окна процессов winws"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1"
+                                              Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding ShowLogs, Mode=TwoWay}"/>
+                            </Grid>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="Показывать логи" FontWeight="Medium"/>
-                                <TextBlock Text="Окна процессов winws"
-                                           FontSize="12"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1"
-                                          Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowLogs, Mode=TwoWay}"/>
-                        </Grid>
-                    </StackPanel>
-
-                    <!-- Right Column -->
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="Система"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,12"/>
-
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="Автозапуск" FontWeight="Medium"/>
-                                <TextBlock Text="Запускать при входе в Windows"
-                                           FontSize="12"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1"
-                                          Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AutoStartEnabled, Mode=TwoWay}"/>
-                        </Grid>
-
-                        <Button Content="Сбросить настройки сети"
-                                Style="{StaticResource SecondaryButton}"
-                                Command="{Binding ResetNetworkCommand}"
-                                HorizontalAlignment="Left"
-                                Padding="16,8"
-                                Margin="0,8,0,0"/>
-                    </StackPanel>
-                </Grid>
+                            <Button Content="Сбросить настройки сети"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding ResetNetworkCommand}"
+                                    HorizontalAlignment="Left"
+                                    Padding="16,8"/>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
             </Border>
         </Grid>
     </Grid>
