@@ -87,6 +87,9 @@ begin
   if CurUninstallStep = usUninstall then
   begin
     // Remove autostart task if exists
-    Exec('schtasks', '/Delete /TN "ZapretUltimate" /F', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('schtasks', '/Delete /TN "ZapretUltimate_Autorun" /F', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+    // Remove autostart registry entry if exists
+    RegDeleteValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 'ZapretUltimate');
   end;
 end;
